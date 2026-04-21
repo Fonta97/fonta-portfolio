@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alessandro / Fonta Portfolio
 
-## Getting Started
+Premium personal portfolio for Alessandro / Fonta, a freelance full stack developer in Italy specializing in web development, custom business systems, WordPress, e-commerce, and AI Engineering.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js App Router
+- React
+- TypeScript
+- Tailwind CSS v4
+- Framer Motion
+- Three.js
+- Vercel-ready configuration
+
+## Project Structure
+
+```txt
+fonta-portfolio/
+  public/
+    assets/
+      alessandro-fonta.jpg
+  src/
+    app/
+      work/[slug]/page.tsx
+      globals.css
+      layout.tsx
+      not-found.tsx
+      opengraph-image.tsx
+      page.tsx
+      robots.ts
+      sitemap.ts
+    components/
+      ContactForm.tsx
+      HomePage.tsx
+      MagneticButton.tsx
+      ProjectDetailClient.tsx
+      ProjectVisual.tsx
+      Reveal.tsx
+      ScrollProgress.tsx
+      SiteHeader.tsx
+      StructuredData.tsx
+      ThreeSignalScene.tsx
+    lib/
+      site-data.ts
+      use-experience-settings.ts
+  vercel.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open `http://localhost:3000`.
 
-## Learn More
+Production build:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+npm run start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Lint:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Deploy the `fonta-portfolio` folder to Vercel. The project is standard Next.js, so Vercel will detect the framework automatically.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The included `vercel.json` adds basic security headers. No environment variables are required for the current static portfolio.
+
+## Content Editing
+
+Most copy, projects, services, capabilities, contact details, and SEO schema content live in:
+
+```txt
+src/lib/site-data.ts
+```
+
+Update `siteConfig.url` before production launch with the real domain. The current value is a placeholder:
+
+```ts
+url: "https://fonta.dev"
+```
+
+## Placeholder / Replacement Notes
+
+- Replace `public/assets/alessandro-fonta.jpg` with a sharper final portrait when ready. Keep the same file name to avoid code changes.
+- Replace the stock mood images in `public/assets/stock-*.jpg` with real project screenshots when case studies are ready.
+- Add real project screenshots later by extending `projects` in `src/lib/site-data.ts` and replacing `ProjectVisual` with `next/image` assets where useful.
+- The contact form opens the visitor email client with a prefilled brief. For a hosted backend form, replace `ContactForm.tsx` with a Server Action or a service such as Resend.
+- Project detail pages are generated from the project entries in `site-data.ts`. Add a new project object and it automatically appears in the homepage, sitemap, and `/work/[slug]`.
+
+## Interaction Notes
+
+- The site defaults to Italian and dark mode, then stores language/theme choices in `localStorage`.
+- The header includes language and theme toggles.
+- The hero uses a lightweight Three.js canvas scene. It respects reduced-motion preferences.
+- Section reveals use CSS scroll-linked animations with a safe fallback for browsers that do not support `animation-timeline`.
+- The hydration warning caused by `cz-shortcut-listen="true"` is from a browser extension mutating `<body>` before React hydrates. The layout uses `suppressHydrationWarning` on `html` and `body` to avoid false-positive dev noise.
+
+## SEO / AEO Included
+
+- Metadata, Open Graph, and Twitter card configuration
+- Dynamic OG image route
+- `robots.ts` and `sitemap.ts`
+- JSON-LD for Person, ProfessionalService, WebSite, ItemList, FAQPage, and project pages
+- Semantic headings and indexable project pages
+- FAQ content for answer-engine visibility
