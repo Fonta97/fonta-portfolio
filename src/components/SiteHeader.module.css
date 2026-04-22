@@ -6,6 +6,7 @@
     var(--header-bar-height) + (var(--header-shell-padding-y) * 2)
   );
   --drawer-gap: 10px;
+  --drawer-offset-extra: 0px;
   --surface: color-mix(in srgb, var(--background) 88%, transparent);
   --surface-strong: color-mix(in srgb, var(--background) 94%, transparent);
   --surface-soft: color-mix(in srgb, var(--background) 92%, transparent);
@@ -329,7 +330,8 @@
 
 .drawer {
   --drawer-top: calc(
-    var(--header-inset) + var(--header-outer-height) + var(--drawer-gap)
+    var(--header-inset) + var(--header-outer-height) + var(--drawer-gap) +
+      var(--drawer-offset-extra)
   );
 
   position: fixed;
@@ -431,6 +433,7 @@ html[data-theme="light"] .languageButton[data-active="true"] {
   .root {
     --header-inset: 12px;
     --header-bar-height: 68px;
+    --drawer-offset-extra: 14px;
 
     padding-inline: 12px;
   }
