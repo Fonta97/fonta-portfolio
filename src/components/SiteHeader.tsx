@@ -249,7 +249,7 @@ export function SiteHeader({
   }, []);
 
   return (
-    <>
+    <div className={styles.layer}>
       <header className={styles.root}>
         <div className={styles.shell}>
           <Link href="/" className={styles.brand} aria-label="Homepage">
@@ -318,41 +318,44 @@ export function SiteHeader({
         className={styles.drawer}
         data-open={isMenuOpen}
         aria-hidden={!isMenuOpen}
+        aria-label="Mobile navigation panel"
       >
-        <nav className={styles.drawerNav} aria-label="Mobile navigation">
-          {menuItems.map((item, index) => (
-            <HeaderNavLink
-              key={`mobile-${item.href}`}
-              href={item.href}
-              label={item.label}
-              isActive={activeHref === item.href}
-              mobile
-              onNavigate={handleNavigate}
-              linkRef={index === 0 ? firstDrawerLinkRef : undefined}
-            />
-          ))}
-        </nav>
+        <div className={styles.drawerSurface}>
+          <nav className={styles.drawerNav} aria-label="Mobile navigation">
+            {menuItems.map((item, index) => (
+              <HeaderNavLink
+                key={`mobile-${item.href}`}
+                href={item.href}
+                label={item.label}
+                isActive={activeHref === item.href}
+                mobile
+                onNavigate={handleNavigate}
+                linkRef={index === 0 ? firstDrawerLinkRef : undefined}
+              />
+            ))}
+          </nav>
 
-        <div className={styles.drawerControls}>
-          <LanguageSwitcher
-            language={language}
-            onChange={onLanguageChange}
-            ariaLabel={copy.languageLabel}
-          />
-          <ThemeToggle
-            theme={theme}
-            onToggle={onThemeToggle}
-            ariaLabel={copy.themeLabel}
-          />
-          <Link
-            href="/#contact"
-            className={styles.cta}
-            onClick={() => handleNavigate("/#contact")}
-          >
-            {copy.headerCta}
-          </Link>
+          <div className={styles.drawerControls}>
+            <LanguageSwitcher
+              language={language}
+              onChange={onLanguageChange}
+              ariaLabel={copy.languageLabel}
+            />
+            <ThemeToggle
+              theme={theme}
+              onToggle={onThemeToggle}
+              ariaLabel={copy.themeLabel}
+            />
+            <Link
+              href="/#contact"
+              className={styles.cta}
+              onClick={() => handleNavigate("/#contact")}
+            >
+              {copy.headerCta}
+            </Link>
+          </div>
         </div>
       </aside>
-    </>
+    </div>
   );
 }
