@@ -1980,6 +1980,10 @@ html[data-theme="light"] .magnetic-button--secondary:hover {
     min-height: auto;
   }
 
+  .hero__atmosphere {
+    inset: -2% -8% -12%;
+  }
+
   .hero__content {
     padding-top: min(9vw, 36px);
   }
@@ -1993,15 +1997,19 @@ html[data-theme="light"] .magnetic-button--secondary:hover {
   }
 
   .hero__planet-field {
-    top: 34px;
+    inset: 10% -24% -18% -24%;
+    width: auto;
+    height: auto;
+    top: auto;
     right: auto;
-    left: 50%;
-    width: min(136vw, 780px);
-    height: min(136vw, 780px);
-    inset: auto;
-    transform: translateX(-50%);
+    left: auto;
+    transform: none;
     mask-image: none;
-    opacity: 0.76;
+    opacity: 0.82;
+  }
+
+  .hero__planet-field .soft-aurora-container {
+    height: 100%;
   }
 
   .signal-grid {
