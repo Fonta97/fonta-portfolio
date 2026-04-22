@@ -97,15 +97,21 @@ export function MagicBento({
             </p>
           </div>
           <div className="magic-bento__beam-scene" aria-hidden="true">
+            <svg
+              className="magic-bento__beam-map"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+            >
+              <line x1="16" y1="78" x2="58" y2="24" />
+              <line x1="16" y1="78" x2="80" y2="35" />
+              <line x1="16" y1="78" x2="58" y2="74" />
+              <line x1="16" y1="78" x2="80" y2="82" />
+            </svg>
             <div className="magic-bento__node magic-bento__node--source">Core</div>
             <div className="magic-bento__node magic-bento__node--one">CMS</div>
             <div className="magic-bento__node magic-bento__node--two">API</div>
             <div className="magic-bento__node magic-bento__node--three">AI</div>
             <div className="magic-bento__node magic-bento__node--four">Data</div>
-            <i className="magic-bento__beam magic-bento__beam--one" />
-            <i className="magic-bento__beam magic-bento__beam--two" />
-            <i className="magic-bento__beam magic-bento__beam--three" />
-            <i className="magic-bento__beam magic-bento__beam--four" />
           </div>
         </article>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import "./ProfileCard.css";
 
 const DEFAULT_INNER_GRADIENT =
   "linear-gradient(145deg, rgba(8, 18, 16, 0.96) 0%, rgba(14, 52, 68, 0.46) 48%, rgba(214, 255, 79, 0.14) 100%)";
@@ -407,7 +408,13 @@ export default function ProfileCard({
                   </div>
                   <button
                     className="pc-contact-btn"
-                    onClick={handleContactButtonClick}
+                    onPointerDown={(event) => {
+                      event.stopPropagation();
+                    }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleContactButtonClick();
+                    }}
                     style={{ pointerEvents: "auto" }}
                     type="button"
                     aria-label={`Contact ${name || "user"}`}

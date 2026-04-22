@@ -282,7 +282,7 @@
   right: var(--ui-inset, 20px);
   bottom: var(--ui-inset, 20px);
   left: var(--ui-inset, 20px);
-  z-index: 2;
+  z-index: 6;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -291,6 +291,11 @@
   backdrop-filter: blur(30px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: calc(max(0px, var(--card-radius) - var(--ui-inset, 20px) + 6px));
+  pointer-events: auto;
+}
+
+.pc-user-info,
+.pc-user-info * {
   pointer-events: auto;
 }
 
@@ -337,6 +342,8 @@
 }
 
 .pc-contact-btn {
+  position: relative;
+  z-index: 2;
   padding: 12px 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 999px;
@@ -345,6 +352,7 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  touch-action: manipulation;
   backdrop-filter: blur(10px);
   transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }

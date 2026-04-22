@@ -18,8 +18,8 @@ export function SmoothScroll() {
       touchMultiplier: 1,
       overscroll: true,
       anchors: {
-        offset: -110,
-        duration: 1.1,
+        offset: -96,
+        duration: 1,
       },
     });
 

@@ -454,7 +454,7 @@ export const projects = [
         en: "Terranova Italy logo",
       },
       foregroundFit: "contain",
-      brandSurface: "dark",
+      brandSurface: "light",
     },
   },
   {

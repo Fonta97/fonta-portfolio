@@ -19,7 +19,7 @@ export function useExperienceSettings() {
   const [theme, setTheme] = useState<ThemeMode>("dark");
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
+    const frame = window.requestAnimationFrame(() => {
       const storedLanguage = window.localStorage.getItem(languageKey);
       const storedTheme = window.localStorage.getItem(themeKey);
       const preferredTheme = window.matchMedia("(prefers-color-scheme: light)").matches
@@ -31,9 +31,9 @@ export function useExperienceSettings() {
       }
 
       setTheme(isTheme(storedTheme) ? storedTheme : preferredTheme);
-    }, 0);
+    });
 
-    return () => window.clearTimeout(timeout);
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export function useExperienceSettings() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
     window.localStorage.setItem(themeKey, theme);
   }, [theme]);
 

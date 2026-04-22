@@ -11,7 +11,7 @@ type ProjectDetailClientProps = {
 };
 
 export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
-  const { language, theme, toggleLanguage, toggleTheme } = useExperienceSettings();
+  const { language, setLanguage, theme, toggleTheme } = useExperienceSettings();
   const copy = pageCopy[language];
   const project = projects.find((item) => item.slug === slug);
 
@@ -22,7 +22,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
       <SiteHeader
         language={language}
         theme={theme}
-        onLanguageToggle={toggleLanguage}
+        onLanguageChange={setLanguage}
         onThemeToggle={toggleTheme}
       />
       <main className="project-detail">

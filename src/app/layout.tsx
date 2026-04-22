@@ -2,10 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/lib/site-data";
 import "lenis/dist/lenis.css";
-import "../components/BounceCards.css";
-import "../components/BorderGlow.css";
-import "../components/FlowingMenu.css";
-import "../components/ProfileCard.css";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -88,6 +84,24 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+const themeBootstrapScript = `
+  (() => {
+    try {
+      const storedTheme = window.localStorage.getItem("fonta-theme");
+      const resolvedTheme =
+        storedTheme === "light" || storedTheme === "dark"
+          ? storedTheme
+          : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+
+      document.documentElement.dataset.theme = resolvedTheme;
+      document.documentElement.style.colorScheme = resolvedTheme;
+    } catch {
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
+    }
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -101,6 +115,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full" suppressHydrationWarning>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
         {children}
       </body>
     </html>

@@ -1,111 +1,358 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatedThemeToggler } from "@/components/AnimatedThemeToggler";
-import BorderGlow from "@/components/BorderGlow";
-import FlowingMenu from "@/components/FlowingMenu";
+import { usePathname } from "next/navigation";
+import {
+  type Ref,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { Language, ThemeMode } from "@/lib/site-data";
 import { navItems, pageCopy, siteConfig } from "@/lib/site-data";
+import styles from "./SiteHeader.module.css";
 
 type SiteHeaderProps = {
   language: Language;
   theme: ThemeMode;
-  onLanguageToggle: () => void;
+  onLanguageChange: (language: Language) => void;
   onThemeToggle: () => void;
 };
+
+type HeaderNavLinkProps = {
+  href: string;
+  label: string;
+  isActive: boolean;
+  mobile?: boolean;
+  onNavigate: (href: string) => void;
+  linkRef?: Ref<HTMLAnchorElement>;
+};
+
+function HeaderNavLink({
+  href,
+  label,
+  isActive,
+  mobile = false,
+  onNavigate,
+  linkRef,
+}: HeaderNavLinkProps) {
+  return (
+    <Link
+      ref={linkRef}
+      href={href}
+      className={mobile ? styles.drawerLink : styles.desktopLink}
+      data-active={isActive}
+      aria-current={isActive ? "page" : undefined}
+      onClick={() => onNavigate(href)}
+    >
+      <span>{label}</span>
+    </Link>
+  );
+}
+
+type ThemeToggleProps = {
+  theme: ThemeMode;
+  onToggle: () => void;
+  ariaLabel: string;
+};
+
+function ThemeToggle({ theme, onToggle, ariaLabel }: ThemeToggleProps) {
+  const isLight = theme === "light";
+
+  return (
+    <button
+      type="button"
+      className={styles.themeToggle}
+      onClick={onToggle}
+      aria-label={ariaLabel}
+      aria-pressed={isLight}
+    >
+      <span className={styles.themeToggleTrack} aria-hidden="true">
+        <span
+          className={styles.themeToggleThumb}
+          data-theme={isLight ? "light" : "dark"}
+        >
+          <span className={styles.themeSun} />
+          <span className={styles.themeMoon} />
+        </span>
+      </span>
+      <span className={styles.themeToggleText} suppressHydrationWarning>
+        {isLight ? "Light" : "Dark"}
+      </span>
+    </button>
+  );
+}
+
+type LanguageSwitcherProps = {
+  language: Language;
+  onChange: (language: Language) => void;
+  ariaLabel: string;
+};
+
+function LanguageSwitcher({
+  language,
+  onChange,
+  ariaLabel,
+}: LanguageSwitcherProps) {
+  return (
+    <div
+      className={styles.languageSwitcher}
+      role="group"
+      aria-label={ariaLabel}
+    >
+      {(["it", "en"] as const).map((item) => (
+        <button
+          key={item}
+          type="button"
+          className={styles.languageButton}
+          data-active={language === item}
+          aria-pressed={language === item}
+          onClick={() => onChange(item)}
+        >
+          {item.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function SiteHeader({
   language,
   theme,
-  onLanguageToggle,
+  onLanguageChange,
   onThemeToggle,
 }: SiteHeaderProps) {
+  const pathname = usePathname();
   const copy = pageCopy[language];
-  const menuItems = navItems.map((item, index) => ({
-    link: item.href,
-    text: item.label[language],
-    image: [
-      "/assets/stock-commerce.jpg",
-      "/assets/stock-ai-workspace.jpg",
-      "/assets/stock-systems-dashboard.jpg",
-      "/assets/alessandro-fonta-2026.jpg",
-      "/assets/case-studies/hib-office.jpg",
-    ][index],
-  }));
-  const headerBg = theme === "dark" ? "#050308" : "#f4efff";
-  const headerMarqueeBg = theme === "dark" ? "#c084fc" : "#7c3aed";
-  const headerMarqueeText = theme === "dark" ? "#120517" : "#f8f5ff";
-  const headerText = theme === "dark" ? "#f5f5f5" : "#120517";
-  const headerBorder = theme === "dark" ? "rgba(255,255,255,0.18)" : "rgba(20,10,33,0.18)";
+  const drawerId = useId();
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const firstDrawerLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeHref, setActiveHref] = useState("/#work");
+
+  const menuItems = useMemo(
+    () =>
+      navItems.map((item) => ({
+        href: item.href,
+        label: item.label[language],
+      })),
+    [language],
+  );
+
+  const syncActiveFromLocation = useCallback(() => {
+    if (typeof window === "undefined") return;
+
+    if (pathname !== "/") {
+      setActiveHref(pathname.startsWith("/work/") ? "/#work" : "/#contact");
+      return;
+    }
+
+    const currentHash = window.location.hash || "#work";
+    const matchingItem = navItems.find((item) => item.href.endsWith(currentHash));
+    setActiveHref(matchingItem?.href ?? "/#work");
+  }, [pathname]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(syncActiveFromLocation);
+    window.addEventListener("hashchange", syncActiveFromLocation);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", syncActiveFromLocation);
+    };
+  }, [syncActiveFromLocation]);
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      return undefined;
+    }
+
+    const sections = navItems
+      .map((item) => {
+        const id = item.href.replace("/#", "");
+        return document.getElementById(id);
+      })
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    if (sections.length === 0) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => right.intersectionRatio - left.intersectionRatio);
+
+        const currentEntry = visibleEntries[0];
+        if (!currentEntry) return;
+
+        const currentHref = `/#${currentEntry.target.id}`;
+        setActiveHref((previous) =>
+          previous === currentHref ? previous : currentHref,
+        );
+      },
+      {
+        rootMargin: "-26% 0px -56% 0px",
+        threshold: [0.2, 0.4, 0.65],
+      },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 880) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", onResize);
+    window.addEventListener("keydown", onEscape);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const menuButton = menuButtonRef.current;
+    document.body.style.overflow = "hidden";
+    window.requestAnimationFrame(() => firstDrawerLinkRef.current?.focus());
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      menuButton?.focus();
+    };
+  }, [isMenuOpen]);
+
+  const handleNavigate = useCallback((href: string) => {
+    setActiveHref(href);
+    setIsMenuOpen(false);
+  }, []);
 
   return (
-    <header className="site-header">
-      <Link href="/" className="site-header__brand" aria-label="Homepage">
-        {siteConfig.shortName}
-      </Link>
-      <div className="site-header__nav" aria-label="Primary navigation">
-        <FlowingMenu
-          className="flowing-menu--header"
-          items={menuItems}
-          speed={18}
-          textColor={headerText}
-          bgColor={headerBg}
-          marqueeBgColor={headerMarqueeBg}
-          marqueeTextColor={headerMarqueeText}
-          borderColor={headerBorder}
-        />
-      </div>
-      <div className="site-header__controls">
-        <BorderGlow
-          className="ui-glow ui-glow--header-control"
-          edgeSensitivity={24}
-          glowColor="274 88 78"
-          backgroundColor={theme === "dark" ? "#09070f" : "#ffffff"}
-          borderRadius={12}
-          glowRadius={20}
-          colors={["#8b5cf6", "#c084fc", "#f472b6"]}
-          fillOpacity={0.18}
-        >
+    <>
+      <header className={styles.root}>
+        <div className={styles.shell}>
+          <Link href="/" className={styles.brand} aria-label="Homepage">
+            {siteConfig.shortName}
+          </Link>
+
+          <nav className={styles.desktopNav} aria-label="Primary navigation">
+            {menuItems.map((item) => (
+              <HeaderNavLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                isActive={activeHref === item.href}
+                onNavigate={handleNavigate}
+              />
+            ))}
+          </nav>
+
+          <div className={styles.desktopControls}>
+            <LanguageSwitcher
+              language={language}
+              onChange={onLanguageChange}
+              ariaLabel={copy.languageLabel}
+            />
+            <ThemeToggle
+              theme={theme}
+              onToggle={onThemeToggle}
+              ariaLabel={copy.themeLabel}
+            />
+            <Link
+              href="/#contact"
+              className={styles.cta}
+              onClick={() => handleNavigate("/#contact")}
+            >
+              {copy.headerCta}
+            </Link>
+          </div>
+
           <button
+            ref={menuButtonRef}
             type="button"
-            className="site-header__toggle"
-            onClick={onLanguageToggle}
-            aria-label={copy.languageLabel}
+            className={styles.menuToggle}
+            aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls={drawerId}
+            onClick={() => setIsMenuOpen((current) => !current)}
           >
-            {language === "it" ? "EN" : "IT"}
+            <span className={styles.menuToggleBar} data-open={isMenuOpen} />
+            <span className={styles.menuToggleBar} data-open={isMenuOpen} />
+            <span className={styles.menuToggleBar} data-open={isMenuOpen} />
           </button>
-        </BorderGlow>
-        <BorderGlow
-          className="ui-glow ui-glow--header-control"
-          edgeSensitivity={24}
-          glowColor="274 88 78"
-          backgroundColor={theme === "dark" ? "#09070f" : "#ffffff"}
-          borderRadius={12}
-          glowRadius={20}
-          colors={["#8b5cf6", "#c084fc", "#f472b6"]}
-          fillOpacity={0.18}
-        >
-          <AnimatedThemeToggler
+        </div>
+      </header>
+
+      <button
+        type="button"
+        className={styles.backdrop}
+        data-open={isMenuOpen}
+        aria-hidden={!isMenuOpen}
+        tabIndex={isMenuOpen ? 0 : -1}
+        onClick={() => setIsMenuOpen(false)}
+      />
+
+      <aside
+        id={drawerId}
+        className={styles.drawer}
+        data-open={isMenuOpen}
+        aria-hidden={!isMenuOpen}
+      >
+        <nav className={styles.drawerNav} aria-label="Mobile navigation">
+          {menuItems.map((item, index) => (
+            <HeaderNavLink
+              key={`mobile-${item.href}`}
+              href={item.href}
+              label={item.label}
+              isActive={activeHref === item.href}
+              mobile
+              onNavigate={handleNavigate}
+              linkRef={index === 0 ? firstDrawerLinkRef : undefined}
+            />
+          ))}
+        </nav>
+
+        <div className={styles.drawerControls}>
+          <LanguageSwitcher
+            language={language}
+            onChange={onLanguageChange}
+            ariaLabel={copy.languageLabel}
+          />
+          <ThemeToggle
             theme={theme}
             onToggle={onThemeToggle}
             ariaLabel={copy.themeLabel}
           />
-        </BorderGlow>
-        <BorderGlow
-          className="ui-glow ui-glow--header-control ui-glow--header-cta"
-          edgeSensitivity={24}
-          glowColor="274 88 78"
-          backgroundColor={theme === "dark" ? "#09070f" : "#ffffff"}
-          borderRadius={12}
-          glowRadius={20}
-          colors={["#8b5cf6", "#c084fc", "#f472b6"]}
-          fillOpacity={0.18}
-        >
-          <Link href="/#contact" className="site-header__cta">
+          <Link
+            href="/#contact"
+            className={styles.cta}
+            onClick={() => handleNavigate("/#contact")}
+          >
             {copy.headerCta}
           </Link>
-        </BorderGlow>
-      </div>
-    </header>
+        </div>
+      </aside>
+    </>
   );
 }

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MagicBento } from "@/components/MagicBento";
-import { SmoothCursor } from "@/components/SmoothCursor";
 import { TypingAnimation } from "@/components/TypingAnimation";
 import BounceCards from "@/components/BounceCards";
 import BorderGlow from "@/components/BorderGlow";
@@ -30,18 +29,17 @@ import type { Language, ThemeMode } from "@/lib/site-data";
 import { useExperienceSettings } from "@/lib/use-experience-settings";
 
 export function HomePage() {
-  const { language, theme, toggleLanguage, toggleTheme } = useExperienceSettings();
+  const { language, setLanguage, theme, toggleTheme } = useExperienceSettings();
   const copy = pageCopy[language];
 
   return (
     <>
-      <SmoothCursor theme={theme} />
       <SmoothScroll />
       <ScrollProgress />
       <SiteHeader
         language={language}
         theme={theme}
-        onLanguageToggle={toggleLanguage}
+        onLanguageChange={setLanguage}
         onThemeToggle={toggleTheme}
       />
       <main id="main">
@@ -72,9 +70,10 @@ function Hero({ language, theme }: { language: Language; theme: ThemeMode }) {
     theme === "dark" ? "rgba(167, 139, 250, 0.34)" : "rgba(147, 51, 234, 0.2)";
 
   const handleCardContactClick = () => {
-    document
-      .querySelector("#contact")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const target = document.getElementById("contact");
+    if (!target) return;
+    window.history.replaceState(null, "", "#contact");
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -483,6 +482,18 @@ function AboutSection({ language }: { language: Language }) {
           transformStyles={transforms}
           enableHover
         />
+      </Reveal>
+      <Reveal className="about__mobile-gallery">
+        {aboutImages.slice(0, 4).map((image, index) => (
+          <div key={image} className={`about__mobile-shot about__mobile-shot--${index + 1}`}>
+            <Image
+              src={image}
+              alt={copy.title}
+              fill
+              sizes="(max-width: 760px) 44vw, 0px"
+            />
+          </div>
+        ))}
       </Reveal>
       <div className="about__content">
         <Reveal>
