@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SitePreloader } from "@/components/SitePreloader";
 import { siteConfig } from "@/lib/site-data";
 import "lenis/dist/lenis.css";
 import "./globals.css";
@@ -116,6 +117,7 @@ export default function RootLayout({
     >
       <body className="min-h-full" suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+        <SitePreloader />
         {children}
       </body>
     </html>
