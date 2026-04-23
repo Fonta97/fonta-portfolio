@@ -666,7 +666,7 @@ function ContactSection({
           colors={["#8b5cf6", "#c084fc", "#f472b6"]}
           fillOpacity={0.24}
         >
-          <ContactForm copy={copy.form} email={siteConfig.email} />
+          <ContactForm copy={copy.form} />
         </BorderGlow>
       </Reveal>
     </section>

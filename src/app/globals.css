@@ -1734,6 +1734,12 @@ html[data-theme="light"] .magic-bento__calendar {
   resize: vertical;
 }
 
+.contact-form__error {
+  color: #f0abfc;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .contact-form input:focus,
 .contact-form select:focus,
 .contact-form textarea:focus {
@@ -1758,6 +1764,12 @@ html[data-theme="light"] .magic-bento__calendar {
 .project-detail__cta a:hover {
   background: var(--acid);
   transform: translateY(-2px);
+}
+
+.contact-form button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+  transform: none;
 }
 
 .contact-form__status {

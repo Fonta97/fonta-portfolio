@@ -1,7 +1,7 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { useState } from "react";
+import { ValidationError, useForm } from "@formspree/react";
+import { useEffect, useRef } from "react";
 
 type ContactFormCopy = {
   name: string;
@@ -12,45 +12,32 @@ type ContactFormCopy = {
   placeholderBudget: string;
   placeholderMessage: string;
   button: string;
-  status: string;
+  sending: string;
+  success: string;
+  error: string;
   options: readonly string[];
 };
 
 type ContactFormProps = {
   copy: ContactFormCopy;
-  email: string;
 };
 
-export function ContactForm({ copy, email }: ContactFormProps) {
-  const [status, setStatus] = useState("");
+export function ContactForm({ copy }: ContactFormProps) {
+  const [state, handleSubmit] = useForm("mnjllagv");
+  const formRef = useRef<HTMLFormElement>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const name = String(form.get("name") || "");
-    const senderEmail = String(form.get("email") || "");
-    const project = String(form.get("project") || "");
-    const budget = String(form.get("budget") || "");
-    const message = String(form.get("message") || "");
+  useEffect(() => {
+    if (state.succeeded) {
+      formRef.current?.reset();
+    }
+  }, [state.succeeded]);
 
-    const subject = encodeURIComponent(`Project inquiry from ${name || "Portfolio visitor"}`);
-    const body = encodeURIComponent(
-      [
-        `${copy.name}: ${name}`,
-        `${copy.email}: ${senderEmail}`,
-        `${copy.project}: ${project}`,
-        `${copy.budget}: ${budget}`,
-        "",
-        message,
-      ].join("\n"),
-    );
-
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    setStatus(copy.status);
-  }
+  const hasErrors = !state.succeeded && Boolean(state.errors);
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit}>
+    <form ref={formRef} className="contact-form" onSubmit={handleSubmit} aria-busy={state.submitting}>
+      <input type="hidden" name="_subject" value="Project inquiry from Fonta portfolio" />
+      <input type="hidden" name="source" value="fonta-portfolio-contact-form" />
       <div className="contact-form__row">
         <label>
           {copy.name}
@@ -59,6 +46,7 @@ export function ContactForm({ copy, email }: ContactFormProps) {
         <label>
           {copy.email}
           <input name="email" type="email" autoComplete="email" required />
+          <ValidationError className="contact-form__error" field="email" errors={state.errors} />
         </label>
       </div>
       <label>
@@ -76,10 +64,13 @@ export function ContactForm({ copy, email }: ContactFormProps) {
       <label>
         {copy.message}
         <textarea name="message" rows={5} placeholder={copy.placeholderMessage} required />
+        <ValidationError className="contact-form__error" field="message" errors={state.errors} />
       </label>
-      <button type="submit">{copy.button}</button>
+      <button type="submit" disabled={state.submitting}>
+        {state.submitting ? copy.sending : copy.button}
+      </button>
       <p aria-live="polite" className="contact-form__status">
-        {status}
+        {state.succeeded ? copy.success : hasErrors ? copy.error : ""}
       </p>
     </form>
   );
