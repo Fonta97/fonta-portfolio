@@ -1,10 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { MagicBento } from "@/components/MagicBento";
 import { TypingAnimation } from "@/components/TypingAnimation";
-import BounceCards from "@/components/BounceCards";
 import BorderGlow from "@/components/BorderGlow";
 import { ContactForm } from "@/components/ContactForm";
 import { MagneticButton } from "@/components/MagneticButton";
@@ -13,7 +13,6 @@ import { ProjectVisual } from "@/components/ProjectVisual";
 import { Reveal } from "@/components/Reveal";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { SiteHeader } from "@/components/SiteHeader";
-import SoftAurora from "@/components/SoftAurora";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import {
   capabilityGroups,
@@ -27,15 +26,25 @@ import {
 } from "@/lib/site-data";
 import type { Language, ThemeMode } from "@/lib/site-data";
 import { useExperienceSettings } from "@/lib/use-experience-settings";
+import { useLiteExperience } from "@/lib/use-lite-experience";
+
+const BounceCards = dynamic(() => import("@/components/BounceCards"), {
+  ssr: false,
+});
+
+const SoftAurora = dynamic(() => import("@/components/SoftAurora"), {
+  ssr: false,
+});
 
 export function HomePage() {
   const { language, setLanguage, theme, toggleTheme } = useExperienceSettings();
+  const isLiteExperience = useLiteExperience();
   const copy = pageCopy[language];
 
   return (
     <>
-      <SmoothScroll />
-      <ScrollProgress />
+      <SmoothScroll disabled={isLiteExperience} />
+      {!isLiteExperience ? <ScrollProgress /> : null}
       <SiteHeader
         language={language}
         theme={theme}
@@ -43,24 +52,32 @@ export function HomePage() {
         onThemeToggle={toggleTheme}
       />
       <main id="main">
-        <Hero language={language} theme={theme} />
+        <Hero language={language} theme={theme} isLiteExperience={isLiteExperience} />
         <CinematicBridge language={language} />
         <StockGallery language={language} />
         <WorkShowcase language={language} />
-        <ServicesSection language={language} />
+        <ServicesSection language={language} isLiteExperience={isLiteExperience} />
         <MagicBentoSection language={language} />
         <ProcessSection language={language} />
-        <CapabilitiesSection language={language} />
-        <AboutSection language={language} />
+        <CapabilitiesSection language={language} isLiteExperience={isLiteExperience} />
+        <AboutSection language={language} isLiteExperience={isLiteExperience} />
         <FAQSection language={language} />
-        <ContactSection language={language} />
+        <ContactSection language={language} isLiteExperience={isLiteExperience} />
       </main>
       <Footer language={language} role={copy.footerRole} />
     </>
   );
 }
 
-function Hero({ language, theme }: { language: Language; theme: ThemeMode }) {
+function Hero({
+  language,
+  theme,
+  isLiteExperience,
+}: {
+  language: Language;
+  theme: ThemeMode;
+  isLiteExperience: boolean;
+}) {
   const copy = pageCopy[language].hero;
   const cardGradient =
     theme === "dark"
@@ -80,30 +97,32 @@ function Hero({ language, theme }: { language: Language; theme: ThemeMode }) {
     <section className="hero section-pad" aria-labelledby="hero-title">
       <div className="hero__atmosphere" aria-hidden="true">
         <div className="hero__nebula" />
-        <div className="hero__planet-field">
-          <SoftAurora
-            speed={theme === "dark" ? 0.52 : 0.44}
-            scale={1.32}
-            brightness={theme === "dark" ? 1.08 : 0.82}
-            color1={theme === "dark" ? "#ede9fe" : "#c084fc"}
-            color2={theme === "dark" ? "#a855f7" : "#7c3aed"}
-            noiseFrequency={2.2}
-            noiseAmplitude={0.82}
-            bandHeight={0.48}
-            bandSpread={1.22}
-            octaveDecay={0.34}
-            layerOffset={0.42}
-            colorSpeed={0.82}
-            enableMouseInteraction
-            mouseInfluence={0.18}
-          />
-        </div>
+        {!isLiteExperience ? (
+          <div className="hero__planet-field">
+            <SoftAurora
+              speed={theme === "dark" ? 0.52 : 0.44}
+              scale={1.32}
+              brightness={theme === "dark" ? 1.08 : 0.82}
+              color1={theme === "dark" ? "#ede9fe" : "#c084fc"}
+              color2={theme === "dark" ? "#a855f7" : "#7c3aed"}
+              noiseFrequency={2.2}
+              noiseAmplitude={0.82}
+              bandHeight={0.48}
+              bandSpread={1.22}
+              octaveDecay={0.34}
+              layerOffset={0.42}
+              colorSpeed={0.82}
+              enableMouseInteraction
+              mouseInfluence={0.18}
+            />
+          </div>
+        ) : null}
         <div className="signal-grid" />
       </div>
       <div className="hero__content">
         <Reveal immediate>
           <p className="eyebrow">
-            <TypingAnimation text={copy.eyebrow} speed={26} />
+            {isLiteExperience ? copy.eyebrow : <TypingAnimation text={copy.eyebrow} speed={26} />}
           </p>
         </Reveal>
         <Reveal immediate delay={0.05}>
@@ -116,6 +135,7 @@ function Hero({ language, theme }: { language: Language; theme: ThemeMode }) {
           <div className="hero__actions">
             <BorderGlow
               className="ui-glow ui-glow--button"
+              disabled={isLiteExperience}
               edgeSensitivity={26}
               glowColor="274 92 80"
               backgroundColor={theme === "dark" ? "#ffffff" : "#ffffff"}
@@ -130,6 +150,7 @@ function Hero({ language, theme }: { language: Language; theme: ThemeMode }) {
             </BorderGlow>
             <BorderGlow
               className="ui-glow ui-glow--button"
+              disabled={isLiteExperience}
               edgeSensitivity={26}
               glowColor="274 92 80"
               backgroundColor={theme === "dark" ? "rgba(255,255,255,0.03)" : "rgba(5,5,5,0.035)"}
@@ -149,24 +170,54 @@ function Hero({ language, theme }: { language: Language; theme: ThemeMode }) {
       </div>
 
       <Reveal className="hero__portrait" immediate delay={0.2}>
-        <ProfileCard
-          className="hero-profile-card"
-          avatarUrl="/assets/alessandro-fonta-2026.jpg"
-          miniAvatarUrl="/assets/alessandro-fonta-2026.jpg"
-          name="Alessandro Fontana"
-          title={language === "it" ? "AI Engineering / Full Stack" : "AI Engineering / Full Stack"}
-          handle="fonta97"
-          status={language === "it" ? "Piemonte / remoto" : "Piedmont / remote"}
-          contactText={language === "it" ? "Contatto" : "Contact"}
-          showUserInfo
-          enableTilt
-          enableMobileTilt={false}
-          onContactClick={handleCardContactClick}
-          behindGlowEnabled
-          behindGlowColor={glowColor}
-          behindGlowSize="48%"
-          innerGradient={cardGradient}
-        />
+        {isLiteExperience ? (
+          <article className="hero-profile-lite">
+            <div className="hero-profile-lite__header">
+              <h3>Alessandro Fontana</h3>
+              <p>{language === "it" ? "AI Engineering / Full Stack" : "AI Engineering / Full Stack"}</p>
+            </div>
+            <div className="hero-profile-lite__media">
+              <Image
+                src="/assets/alessandro-fonta-2026.jpg"
+                alt="Alessandro Fontana portrait"
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(max-width: 760px) 92vw, (max-width: 1120px) 420px, 450px"
+              />
+            </div>
+            <div className="hero-profile-lite__footer">
+              <div className="hero-profile-lite__identity">
+                <span>@fonta97</span>
+                <p>{language === "it" ? "Piemonte / remoto" : "Piedmont / remote"}</p>
+              </div>
+              <button type="button" onClick={handleCardContactClick}>
+                {language === "it" ? "Contatto" : "Contact"}
+              </button>
+            </div>
+          </article>
+        ) : (
+          <ProfileCard
+            className="hero-profile-card"
+            avatarUrl="/assets/alessandro-fonta-2026.jpg"
+            miniAvatarUrl="/assets/alessandro-fonta-2026.jpg"
+            name="Alessandro Fontana"
+            title={language === "it" ? "AI Engineering / Full Stack" : "AI Engineering / Full Stack"}
+            handle="fonta97"
+            status={language === "it" ? "Piemonte / remoto" : "Piedmont / remote"}
+            contactText={language === "it" ? "Contatto" : "Contact"}
+            showUserInfo
+            enableTilt
+            enableMobileTilt={false}
+            onContactClick={handleCardContactClick}
+            behindGlowEnabled
+            behindGlowColor={glowColor}
+            behindGlowSize="48%"
+            innerGradient={cardGradient}
+            avatarLoading="eager"
+            avatarFetchPriority="high"
+          />
+        )}
       </Reveal>
     </section>
   );
@@ -332,7 +383,13 @@ function WorkShowcase({ language }: { language: Language }) {
   );
 }
 
-function ServicesSection({ language }: { language: Language }) {
+function ServicesSection({
+  language,
+  isLiteExperience,
+}: {
+  language: Language;
+  isLiteExperience: boolean;
+}) {
   const copy = pageCopy[language].services;
 
   return (
@@ -348,6 +405,7 @@ function ServicesSection({ language }: { language: Language }) {
           <Reveal key={service.title.en} delay={index * 0.035}>
             <BorderGlow
               className="ui-glow ui-glow--card"
+              disabled={isLiteExperience}
               edgeSensitivity={24}
               glowColor="274 88 78"
               backgroundColor="var(--contrast-card)"
@@ -398,7 +456,13 @@ function ProcessSection({ language }: { language: Language }) {
   );
 }
 
-function CapabilitiesSection({ language }: { language: Language }) {
+function CapabilitiesSection({
+  language,
+  isLiteExperience,
+}: {
+  language: Language;
+  isLiteExperience: boolean;
+}) {
   const copy = pageCopy[language].capabilities;
   const band = capabilityGroups.flatMap((group) => group.items).slice(0, 18);
 
@@ -409,7 +473,11 @@ function CapabilitiesSection({ language }: { language: Language }) {
       aria-labelledby="capabilities-title"
     >
       <div className="capabilities__band" aria-hidden="true">
-        <div className="capabilities__band-track">
+        <div
+          className={`capabilities__band-track ${
+            isLiteExperience ? "capabilities__band-track--static" : ""
+          }`.trim()}
+        >
           {[...band, ...band].map((item, index) => (
             <span key={`${item}-${index}`}>{item}</span>
           ))}
@@ -429,6 +497,7 @@ function CapabilitiesSection({ language }: { language: Language }) {
           <Reveal key={group.label.en} delay={index * 0.04}>
             <BorderGlow
               className="ui-glow ui-glow--card"
+              disabled={isLiteExperience}
               edgeSensitivity={24}
               glowColor="274 88 78"
               backgroundColor="var(--panel)"
@@ -453,7 +522,13 @@ function CapabilitiesSection({ language }: { language: Language }) {
   );
 }
 
-function AboutSection({ language }: { language: Language }) {
+function AboutSection({
+  language,
+  isLiteExperience,
+}: {
+  language: Language;
+  isLiteExperience: boolean;
+}) {
   const copy = pageCopy[language].about;
   const aboutImages = [
     "/assets/about-1.jpeg",
@@ -470,31 +545,34 @@ function AboutSection({ language }: { language: Language }) {
 
   return (
     <section id="about" className="section-pad about" aria-labelledby="about-title">
-      <Reveal className="about__image">
-        <BounceCards
-          className="about__bounce-cards"
-          images={aboutImages}
-          containerWidth={520}
-          containerHeight={520}
-          animationDelay={0.28}
-          animationStagger={0.08}
-          easeType="elastic.out(1, 0.5)"
-          transformStyles={transforms}
-          enableHover
-        />
-      </Reveal>
-      <Reveal className="about__mobile-gallery">
-        {aboutImages.slice(0, 4).map((image, index) => (
-          <div key={image} className={`about__mobile-shot about__mobile-shot--${index + 1}`}>
-            <Image
-              src={image}
-              alt={copy.title}
-              fill
-              sizes="(max-width: 760px) 44vw, 0px"
-            />
-          </div>
-        ))}
-      </Reveal>
+      {!isLiteExperience ? (
+        <Reveal className="about__image">
+          <BounceCards
+            className="about__bounce-cards"
+            images={aboutImages}
+            containerWidth={520}
+            containerHeight={520}
+            animationDelay={0.28}
+            animationStagger={0.08}
+            easeType="elastic.out(1, 0.5)"
+            transformStyles={transforms}
+            enableHover
+          />
+        </Reveal>
+      ) : (
+        <Reveal className="about__mobile-gallery">
+          {aboutImages.slice(0, 4).map((image, index) => (
+            <div key={image} className={`about__mobile-shot about__mobile-shot--${index + 1}`}>
+              <Image
+                src={image}
+                alt={copy.title}
+                fill
+                sizes="(max-width: 760px) 44vw, 0px"
+              />
+            </div>
+          ))}
+        </Reveal>
+      )}
       <div className="about__content">
         <Reveal>
           <p className="eyebrow">{copy.eyebrow}</p>
@@ -554,7 +632,13 @@ function FAQSection({ language }: { language: Language }) {
   );
 }
 
-function ContactSection({ language }: { language: Language }) {
+function ContactSection({
+  language,
+  isLiteExperience,
+}: {
+  language: Language;
+  isLiteExperience: boolean;
+}) {
   const copy = pageCopy[language].contact;
 
   return (
@@ -577,6 +661,7 @@ function ContactSection({ language }: { language: Language }) {
       <Reveal delay={0.08}>
         <BorderGlow
           className="contact__form ui-glow ui-glow--panel"
+          disabled={isLiteExperience}
           edgeSensitivity={24}
           glowColor="274 88 78"
           backgroundColor="var(--panel)"

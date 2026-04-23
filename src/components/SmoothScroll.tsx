@@ -3,9 +3,17 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
 
-export function SmoothScroll() {
+type SmoothScrollProps = {
+  disabled?: boolean;
+};
+
+export function SmoothScroll({ disabled = false }: SmoothScrollProps) {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      disabled ||
+      window.matchMedia("(prefers-reduced-motion: reduce), (hover: none), (pointer: coarse)")
+        .matches
+    ) {
       return undefined;
     }
 

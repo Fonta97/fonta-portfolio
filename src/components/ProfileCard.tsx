@@ -48,6 +48,8 @@ type ProfileCardProps = {
   contactText?: string;
   showUserInfo?: boolean;
   onContactClick?: () => void;
+  avatarLoading?: "lazy" | "eager";
+  avatarFetchPriority?: "high" | "low" | "auto";
 };
 
 type TiltEngine = {
@@ -79,6 +81,8 @@ export default function ProfileCard({
   contactText = "Contact",
   showUserInfo = true,
   onContactClick,
+  avatarLoading = "lazy",
+  avatarFetchPriority = "auto",
 }: ProfileCardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -382,7 +386,8 @@ export default function ProfileCard({
                 className="avatar"
                 src={avatarUrl}
                 alt={`${name || "User"} avatar`}
-                loading="lazy"
+                loading={avatarLoading}
+                fetchPriority={avatarFetchPriority}
                 onError={(event) => {
                   event.currentTarget.style.display = "none";
                 }}

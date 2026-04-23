@@ -94,6 +94,7 @@ function animateValue({
 type BorderGlowProps = {
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
   edgeSensitivity?: number;
   glowColor?: string;
   backgroundColor?: string;
@@ -109,6 +110,7 @@ type BorderGlowProps = {
 export default function BorderGlow({
   children,
   className = "",
+  disabled = false,
   edgeSensitivity = 30,
   glowColor = "40 80 80",
   backgroundColor = "#120F17",
@@ -219,6 +221,20 @@ export default function BorderGlow({
       onEnd: () => card.classList.remove("sweep-active"),
     });
   }, [animated]);
+
+  if (disabled) {
+    return (
+      <div
+        className={`border-glow-card border-glow-card--disabled ${className}`.trim()}
+        style={{
+          ["--card-bg" as string]: backgroundColor,
+          ["--border-radius" as string]: `${borderRadius}px`,
+        }}
+      >
+        <div className="border-glow-inner">{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div
