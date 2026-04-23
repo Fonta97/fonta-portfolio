@@ -490,7 +490,7 @@ function CapabilitiesSection({
       </div>
       <div className="capabilities__grid">
         {capabilityGroups.map((group, index) => (
-          <Reveal key={group.label.en} delay={index * 0.04}>
+          <Reveal key={group.label.en} delay={index * 0.04} noBlur>
             <BorderGlow
               className="ui-glow ui-glow--card"
               disabled={isLiteExperience}

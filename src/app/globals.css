@@ -154,6 +154,11 @@ button {
   animation-range: entry 8% cover 34%;
 }
 
+.reveal-scroll--soft {
+  filter: none;
+  animation-name: reveal-scroll-soft;
+}
+
 .typing-animation {
   display: inline-flex;
   align-items: center;
@@ -206,6 +211,19 @@ button {
   100% {
     opacity: 1;
     filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-scroll-soft {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 42px));
+  }
+
+  72%,
+  100% {
+    opacity: 1;
     transform: translateY(0);
   }
 }
