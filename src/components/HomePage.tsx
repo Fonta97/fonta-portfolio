@@ -473,11 +473,7 @@ function CapabilitiesSection({
       aria-labelledby="capabilities-title"
     >
       <div className="capabilities__band" aria-hidden="true">
-        <div
-          className={`capabilities__band-track ${
-            isLiteExperience ? "capabilities__band-track--static" : ""
-          }`.trim()}
-        >
+        <div className="capabilities__band-track">
           {[...band, ...band].map((item, index) => (
             <span key={`${item}-${index}`}>{item}</span>
           ))}

@@ -2076,17 +2076,10 @@ html[data-theme="light"] .magnetic-button--secondary:hover {
   }
 }
 
-@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .reveal-scroll,
-  .cinematic__word,
-  .typing-animation__caret,
-  .magic-bento__list-item,
-  .capabilities__band-track,
-  .capabilities__band-track--static {
+@media (hover: none), (pointer: coarse) {
+  .magic-bento__list-item {
     animation: none !important;
     transform: none;
-    filter: none;
-    opacity: 1;
   }
 
   .kinetic-orb,
@@ -2132,6 +2125,20 @@ html[data-theme="light"] .magnetic-button--secondary:hover {
   .about__mobile-shot--3,
   .about__mobile-shot--4 {
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-scroll,
+  .cinematic__word,
+  .typing-animation__caret,
+  .magic-bento__list-item,
+  .capabilities__band-track,
+  .capabilities__band-track--static {
+    animation: none !important;
+    transform: none;
+    filter: none;
+    opacity: 1;
   }
 }
 
@@ -2447,10 +2454,16 @@ html[data-theme="light"] .magnetic-button--secondary:hover {
   }
 
   .reveal-scroll {
-    opacity: 1;
-    filter: none;
-    transform: none;
-    animation: none;
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(var(--reveal-y, 28px));
+    animation: reveal-scroll both linear;
+    animation-timeline: view();
+    animation-range: entry 8% cover 28%;
+  }
+
+  .capabilities__band-track {
+    animation-duration: 34s;
   }
 
   .footer {
