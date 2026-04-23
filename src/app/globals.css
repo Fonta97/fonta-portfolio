@@ -2480,6 +2480,11 @@ html[data-theme="light"] .magnetic-button--secondary:hover {
     animation-range: entry 8% cover 28%;
   }
 
+  .reveal-scroll--soft {
+    filter: none;
+    animation-name: reveal-scroll-soft;
+  }
+
   .capabilities__band-track {
     animation-duration: 34s;
   }
